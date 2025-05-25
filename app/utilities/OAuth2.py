@@ -2,9 +2,13 @@ from jose import jwt, JWTError, ExpiredSignatureError
 from app.config import settings
 from datetime import datetime, timedelta
 from app import schemas, models
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status,Depends
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
+from fastapi.security import OAuth2PasswordBearer
+from app.database import get_db
+
+ouath_schema=OAuth2PasswordBearer(tokenUrl="login")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -43,7 +47,7 @@ def verif_access_token(token: str, credentials_exception):
         raise credentials_exception
 
 
-def get_current_admin(db:Session, token:str):
+def get_current_admin(db:Session = Depends(get_db), token:str = Depends(ouath_schema)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail=f"Could not validate credentials",

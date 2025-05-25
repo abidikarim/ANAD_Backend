@@ -7,6 +7,7 @@ from app import models
 from sqlalchemy import or_
 from app.utilities.upload_file import upload_to_cloudinary
 import cloudinary.uploader
+from app.utilities.OAuth2 import get_current_admin
 
 router = APIRouter(prefix="/post",tags=["Post"])
 
@@ -34,7 +35,7 @@ def get_posts(pg_params:schemas.PaginationParams = Depends(),db:Session = Depend
         return schemas.BaseOut(status=400,message="Somthing went wrong")
 
 @router.post("", response_model=schemas.BaseOut)
-async def create_post(post_data: str = Form(...), image: UploadFile = File(...), db: Session = Depends(get_db)):
+async def create_post(post_data: str = Form(...), image: UploadFile = File(...), db: Session = Depends(get_db),current_admin = Depends(get_current_admin)):
     try:
         upload_result=None
         # Step 1: Parse post_data
@@ -61,7 +62,7 @@ async def create_post(post_data: str = Form(...), image: UploadFile = File(...),
 
 
 @router.put("/{id}", response_model=schemas.BaseOut)
-async def update_post(id: int, post_data: str = Form(...), image: UploadFile = File(None), db: Session = Depends(get_db)):
+async def update_post(id: int, post_data: str = Form(...), image: UploadFile = File(None), db: Session = Depends(get_db),current_admin = Depends(get_current_admin)):
     try:
         upload_result=None
         # Get existing post
@@ -93,7 +94,7 @@ async def update_post(id: int, post_data: str = Form(...), image: UploadFile = F
         return schemas.BaseOut(status_code=400, message="Somthing went wrong. Please try again.")
 
 @router.delete("/{post_id}", response_model=schemas.BaseOut)
-def delete_post(post_id: int, db: Session = Depends(get_db)):
+def delete_post(post_id: int, db: Session = Depends(get_db),current_admin = Depends(get_current_admin)):
     try:
         # Fetch post from DB
         post = db.query(models.Post).filter(models.Post.id == post_id).first()

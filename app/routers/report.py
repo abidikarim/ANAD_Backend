@@ -3,11 +3,11 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from app import schemas, models
 from app.database import get_db
-
+from app.utilities.OAuth2 import get_current_admin
 router = APIRouter(prefix="/report", tags=["Report"])
 
 @router.get("", response_model=schemas.ReportsOut)
-def get_reports(pg_params: schemas.PaginationParams = Depends(), db: Session = Depends(get_db)):
+def get_reports(pg_params: schemas.PaginationParams = Depends(), db: Session = Depends(get_db),current_admin = Depends(get_current_admin)):
     try:
         skip = (pg_params.page_number - 1) * pg_params.page_size
         limit = pg_params.page_size

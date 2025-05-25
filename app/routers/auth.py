@@ -4,7 +4,7 @@ from app.utilities.OAuth2 import create_access_token,get_current_admin,verify_pa
 from app.database import get_db
 from sqlalchemy.orm import Session
 from app import models,schemas
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import  OAuth2PasswordRequestForm
 from datetime import datetime
 from app.utilities.send_email import send_mail
 import uuid
